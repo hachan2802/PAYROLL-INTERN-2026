@@ -64,13 +64,13 @@ export function Root() {
         />
 
         {/* Version / Update Indicator */}
-        <div className="fixed bottom-6 right-8 z-[100] pointer-events-none">
-          <div className="flex flex-col items-end opacity-20 hover:opacity-100 transition-opacity duration-500">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 font-mono">
-              Build v1.2.4
+        <div className="fixed top-6 right-8 z-[100] pointer-events-none">
+          <div className="flex flex-col items-end transition-opacity duration-500">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary font-mono drop-shadow-sm bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20 backdrop-blur-[1px]">
+              Build V02.4
             </span>
-            <span className="text-[9px] font-bold text-foreground/30 font-mono mt-0.5">
-              Updated: 2026-04-22 18:05
+            <span className="text-[9px] font-bold text-primary/40 font-mono mt-1.5 pr-1 italic">
+              Updated: 2026-04-23 04:10
             </span>
           </div>
         </div>
