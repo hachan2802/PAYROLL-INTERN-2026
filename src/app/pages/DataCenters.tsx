@@ -18,6 +18,10 @@ import {
   Landmark,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { Calendar } from '../components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
+import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
 import { DataTable, DataTableRef } from '../components/DataTable';
 import { ConfirmDialog } from '../components/shared/ConfirmDialog';
@@ -66,17 +70,19 @@ export function DataCenters() {
   const [showSearch, setShowSearch] = useState(false);
   const tableRef = React.useRef<DataTableRef>(null);
 
-  // Thêm state cho ngày tháng
-  const [fromDate, setFromDate] = useState(() => {
+  // Thêm state cho ngày tháng (Dùng đối tượng Date để dùng với Calendar)
+  const [fromDate, setFromDate] = useState<Date>(() => {
     const d = new Date();
     d.setDate(1);
-    return d.toISOString().split('T')[0];
+    d.setHours(0, 0, 0, 0);
+    return d;
   });
-  const [toDate, setToDate] = useState(() => {
+  const [toDate, setToDate] = useState<Date>(() => {
     const d = new Date();
     d.setMonth(d.getMonth() + 1);
     d.setDate(0);
-    return d.toISOString().split('T')[0];
+    d.setHours(23, 59, 59, 999);
+    return d;
   });
 
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -151,8 +157,8 @@ export function DataCenters() {
       }
 
       // 2. Lọc dữ liệu Q_Roster theo ngày
-      const from = new Date(fromDate);
-      const to = new Date(toDate);
+      const from = fromDate;
+      const to = toDate;
 
       const filteredRoster = appData.Q_Roster.filter((row: any) => {
         const rowDateStr = row['Date'] || row['Ngày'];
@@ -258,8 +264,8 @@ export function DataCenters() {
             'ID Number': id,
             'Full name': fullName,
             'Salary Scale': rates.scale || 'S1',
-            From: fromDate,
-            To: toDate,
+            From: format(fromDate, 'yyyy-MM-dd'),
+            To: format(toDate, 'yyyy-MM-dd'),
             'Bank Account Number': bankAccount,
             'Bank Name': staffInfo['Bank Name'] || staffInfo['Ngân hàng'] || '',
             'CITAD code': staffInfo['CITAD code'] || '',
@@ -515,20 +521,50 @@ export function DataCenters() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 bg-white border border-border rounded-full p-1 shadow-sm px-4">
-              <input
-                type="date"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-                className="bg-transparent border-none outline-none text-[0.625rem] font-bold uppercase tracking-widest text-primary cursor-pointer py-2 focus:text-secondary transition-colors"
-              />
-              <div className="w-px h-4 bg-border" />
-              <input
-                type="date"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-                className="bg-transparent border-none outline-none text-[0.625rem] font-bold uppercase tracking-widest text-primary cursor-pointer py-2 focus:text-secondary transition-colors"
-              />
+            <div className="flex items-center gap-2 bg-white border border-border rounded-full p-1.5 shadow-sm px-3">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="h-9 px-4 rounded-full text-[0.625rem] font-bold uppercase tracking-widest text-primary hover:bg-primary/5 gap-2 transition-all"
+                  >
+                    <span className="opacity-40">Từ:</span>
+                    {format(fromDate, 'dd/MM/yyyy')}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 rounded-2xl border-primary/10 shadow-2xl" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={fromDate}
+                    onSelect={(date) => date && setFromDate(date)}
+                    initialFocus
+                    locale={vi}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <div className="w-px h-4 bg-border/60 mx-1" />
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="h-9 px-4 rounded-full text-[0.625rem] font-bold uppercase tracking-widest text-primary hover:bg-primary/5 gap-2 transition-all"
+                  >
+                    <span className="opacity-40">Đến:</span>
+                    {format(toDate, 'dd/MM/yyyy')}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 rounded-2xl border-primary/10 shadow-2xl" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={toDate}
+                    onSelect={(date) => date && setToDate(date)}
+                    initialFocus
+                    locale={vi}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="flex items-center gap-3">
